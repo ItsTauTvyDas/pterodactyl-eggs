@@ -1,7 +1,7 @@
 # pterodactyl-eggs
 Some of the eggs I have made
 
-## How to get server pack downlaod link?
+## How to get server pack download link?
 In CurseForge app, click "Download Server Pack", after that, this will redirect you to a browser
 ![image](https://github.com/ItsTauTvyDas/pterodactyl-eggs/assets/31439275/77521d54-ae04-486e-bf04-8320ce2502d7)
 
