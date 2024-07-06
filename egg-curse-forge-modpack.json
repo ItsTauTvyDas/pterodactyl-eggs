@@ -1,0 +1,48 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2024-07-06T03:10:50+03:00",
+    "name": "CurseForge Modpack",
+    "author": "tautvydas.gaming@gmail.com",
+    "description": null,
+    "features": null,
+    "docker_images": {
+        "Java 21": "ghcr.io\/pterodactyl\/yolks:java_21",
+        "Java 19": "ghcr.io\/pterodactyl\/yolks:java_19",
+        "Java 18": "ghcr.io\/pterodactyl\/yolks:java_18",
+        "Java 17": "ghcr.io\/pterodactyl\/yolks:java_17",
+        "Java 16": "ghcr.io\/pterodactyl\/yolks:java_16",
+        "Java 11": "ghcr.io\/pterodactyl\/yolks:java_11",
+        "Java 8": "ghcr.io\/pterodactyl\/yolks:java_8"
+    },
+    "file_denylist": [],
+    "startup": "java -Dlog4j2.formatMsgNoLookups=true -Xms128M -XX:MaxRAMPercentage=95.0 -jar server-launcher.jar nogui",
+    "config": {
+        "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\",\r\n            \"query.port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! For help, type \"\r\n}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "apt update\r\napt install --no-install-recommends -y curl unzip sed\r\n\r\nif [[ ! -d \/mnt\/server ]]; then\r\n  mkdir \/mnt\/server\r\nfi\r\n\r\ncd \/mnt\/server\r\n\r\n# Delete old files for the clean reinstall\r\nif [[ -f server-launcher.jar || -d mods || -d config || -d defaultconfigs ]]; then\r\n  echo 'Removing old files... (mods, config and defaultconfigs files)'\r\n  rm -rf server-launcher.jar mods config defaultconfigs\r\nfi\r\n\r\n# Download and unzip modpack server pack\r\necho 'Downloading server pack...'\r\ncurl -sSo server_pack.zip ${MODPACK_DOWNLOAD_LINK}\r\nif [[ ! -f .\/server_pack.zip ]]; then\r\n  echo 'Error downloading server pack!'\r\n  exit\r\nfi\r\nunzip -o server_pack.zip\r\nif [[ ! -f .\/variables.txt ]]; then\r\n  echo 'variables.txt doesn''t exist, meaning the server pack zip file is probably corrupted or it''s not the right file...'\r\n  exit\r\nfi\r\necho 'Showing server pack''s variables (ignore java args as they are not going to be used).'\r\necho -e '\\n'\r\ncat variables.txt\r\necho -e '\\n\\n'\r\n\r\n# Remove unnecessary files\r\nrm server_pack.zip start.ps1\r\n\r\n# No need for the server to auto start, so deleting last lines\r\nawk '{print} \/^eula$\/ {exit}' start.sh | sed '$d' > installation.sh\r\n\r\n# Rename server launcher\r\necho -e '\\nmv $LAUNCHER_JAR_LOCATION server-launcher.jar' >> installation.sh\r\n\r\n# Run install script\r\necho 'Running install script'\r\necho '-------------------------------------------'\r\nbash installation.sh | tee install_logs.log\r\necho 'Install logs saved to install_logs.log'\r\necho '-------------------------------------------'\r\n\r\n# Delete install files\r\nrm installation.sh variables.txt start.sh\r\n\r\necho 'Install Complete.'",
+            "container": "openjdk:21-jdk-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Server pack download URL",
+            "description": "Modpack server pack download URL. Reinstall the server if installed already for this to take effect (this will only delete mods, config and defaultconfigs folders).",
+            "env_variable": "MODPACK_DOWNLOAD_LINK",
+            "default_value": "",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|url|max:200",
+            "field_type": "text"
+        }
+    ]
+}
